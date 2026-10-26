@@ -1,0 +1,261 @@
+/* Estilo simples do Controle de Gastos. Mobile primeiro: uma coluna por padrão. */
+
+:root {
+  --cor-fundo: #f4f6f8;
+  --cor-texto: #1f2933;
+  --cor-borda: #d9dee3;
+  --cor-principal: #2563eb;
+  --cor-receita: #15803d;
+  --cor-gasto: #b45309;
+  --cor-negativo: #dc2626;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--cor-principal);
+}
+
+.cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.marca {
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+
+.conteudo {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h1 {
+  margin-top: 0.5rem;
+  font-size: 1.6rem;
+}
+
+/* Mensagens de sucesso e erro */
+.mensagens {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.mensagem {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+}
+
+.mensagem.error {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+/* Navegação entre meses */
+.navegacao-mes {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Cartões de totais: uma coluna no celular */
+.totais {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.cartao {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+}
+
+.cartao-titulo {
+  font-size: 0.9rem;
+  color: #52606d;
+}
+
+.cartao-valor {
+  font-size: 1.5rem;
+}
+
+.receita {
+  color: var(--cor-receita);
+}
+
+.gasto {
+  color: var(--cor-gasto);
+}
+
+/* Saldo negativo em vermelho */
+.saldo-negativo {
+  color: var(--cor-negativo);
+}
+
+/* Botões */
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.botao {
+  display: inline-block;
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-radius: 6px;
+  background: var(--cor-principal);
+  color: #fff;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.botao-gasto {
+  background: var(--cor-gasto);
+}
+
+.botao-receita {
+  background: var(--cor-receita);
+}
+
+.botao-perigo {
+  background: var(--cor-negativo);
+}
+
+.botao-secundario {
+  background: #fff;
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-borda);
+}
+
+/* Tabela de lançamentos */
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid var(--cor-borda);
+}
+
+.tabela th,
+.tabela td {
+  padding: 0.6rem;
+  text-align: left;
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.tabela .direita {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.acoes-linha a {
+  margin-right: 0.5rem;
+}
+
+.vazio {
+  padding: 1.5rem;
+  text-align: center;
+  background: #fff;
+  border: 1px dashed var(--cor-borda);
+  border-radius: 8px;
+}
+
+/* Formulário */
+.formulario {
+  max-width: 480px;
+}
+
+.campo {
+  margin-bottom: 1rem;
+}
+
+.campo label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: bold;
+}
+
+.campo input,
+.campo select {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #fff;
+}
+
+.erro {
+  margin: 0.25rem 0 0;
+  color: var(--cor-negativo);
+  font-size: 0.9rem;
+}
+
+/* Confirmação de exclusão */
+.detalhes dt {
+  font-weight: bold;
+}
+
+.detalhes dd {
+  margin: 0 0 0.5rem;
+}
+
+/* Telas maiores: três cartões lado a lado */
+@media (min-width: 640px) {
+  .totais {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Celular: a tabela vira uma lista de blocos, sem rolagem lateral */
+@media (max-width: 639px) {
+  .tabela thead {
+    display: none;
+  }
+
+  .tabela tr {
+    display: block;
+    padding: 0.5rem;
+    border-bottom: 2px solid var(--cor-borda);
+  }
+
+  .tabela td {
+    display: block;
+    padding: 0.2rem 0;
+    border: 0;
+  }
+
+  .tabela .direita {
+    text-align: left;
+    font-weight: bold;
+  }
+}
