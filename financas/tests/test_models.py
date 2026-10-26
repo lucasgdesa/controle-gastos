@@ -55,3 +55,24 @@ def test_categoria_com_lancamentos_nao_pode_ser_excluida(cat_gasto):
     novo_lancamento(cat_gasto).save()
     with pytest.raises(ProtectedError):
         cat_gasto.delete()  # CA24
+
+
+def test_categorias_iniciais_existem(db):  # CA23
+    gastos = Categoria.objects.filter(tipo=Tipo.GASTO).values_list("nome", flat=True)
+    receitas = Categoria.objects.filter(tipo=Tipo.RECEITA).values_list(
+        "nome", flat=True
+    )
+    assert set(gastos) >= {
+        "Alimentação",
+        "Moradia",
+        "Transporte",
+        "Saúde",
+        "Educação",
+        "Lazer",
+        "Contas e serviços",
+        "Outros",
+    }
+    assert set(receitas) >= {"Salário", "Freelance", "Presente", "Outros"}
+    # as 8 + 4 iniciais (as fixtures de teste só entram quando pedidas)
+    assert gastos.count() == 8
+    assert receitas.count() == 4
