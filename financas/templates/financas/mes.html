@@ -5,6 +5,12 @@
 {% block conteudo %}
   <h1>{{ data_mes|date:"F \d\e Y"|capfirst }}</h1>
 
+  <nav class="navegacao-mes">
+    <a href="{% url 'mes' anterior.ano anterior.mes %}">&lsaquo; Mês anterior</a>
+    <a href="{% url 'mes_atual' %}">Mês atual</a>
+    <a href="{% url 'mes' proximo.ano proximo.mes %}">Próximo mês &rsaquo;</a>
+  </nav>
+
   <section class="totais">
     <div class="cartao">
       <span class="cartao-titulo">Total de receitas</span>

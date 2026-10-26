@@ -22,4 +22,11 @@ def mes(request, ano, mes):
 def pagina_do_mes(request, ano, mes):
     contexto = resumo_do_mes(ano, mes)
     contexto["data_mes"] = date(ano, mes, 1)
+    # Mês anterior e seguinte, cuidando da virada de ano.
+    contexto["anterior"] = (
+        {"ano": ano - 1, "mes": 12} if mes == 1 else {"ano": ano, "mes": mes - 1}
+    )
+    contexto["proximo"] = (
+        {"ano": ano + 1, "mes": 1} if mes == 12 else {"ano": ano, "mes": mes + 1}
+    )
     return render(request, "financas/mes.html", contexto)

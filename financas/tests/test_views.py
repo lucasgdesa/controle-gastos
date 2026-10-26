@@ -84,3 +84,15 @@ def test_ordem_da_lista(client):  # CA22
         "décimo-dia",
         "terceiro-dia",
     ]
+
+
+def test_links_de_navegacao_dezembro(client):  # CA19
+    html = client.get("/2026/12/").content.decode()
+    assert 'href="/2027/1/"' in html
+    assert 'href="/2026/11/"' in html
+
+
+def test_link_mes_anterior_em_janeiro(client):  # CA19
+    html = client.get("/2026/1/").content.decode()
+    assert 'href="/2025/12/"' in html
+    assert 'href="/2026/2/"' in html
