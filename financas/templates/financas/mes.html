@@ -26,6 +26,11 @@
     </div>
   </section>
 
+  <div class="acoes">
+    <a class="botao botao-gasto" href="{% url 'lancamento_novo' 'gasto' %}">Novo gasto</a>
+    <a class="botao botao-receita" href="{% url 'lancamento_novo' 'receita' %}">Nova receita</a>
+  </div>
+
   {% if lancamentos %}
     <table class="tabela">
       <thead>

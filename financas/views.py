@@ -1,10 +1,19 @@
 from datetime import date
 
+from django.contrib import messages
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils import timezone
 
-from .models import resumo_do_mes
+from .forms import LancamentoForm
+from .models import Lancamento, Tipo, resumo_do_mes
+
+TITULOS_NOVO = {Tipo.GASTO: "Novo gasto", Tipo.RECEITA: "Nova receita"}
+MENSAGENS_CADASTRO = {
+    Tipo.GASTO: "Gasto cadastrado com sucesso.",
+    Tipo.RECEITA: "Receita cadastrada com sucesso.",
+}
 
 
 def mes_atual(request):
@@ -30,3 +39,25 @@ def pagina_do_mes(request, ano, mes):
         {"ano": ano + 1, "mes": 1} if mes == 12 else {"ano": ano, "mes": mes + 1}
     )
     return render(request, "financas/mes.html", contexto)
+
+
+def redireciona_para_o_mes(data):
+    return redirect("mes", ano=data.year, mes=data.month)
+
+
+def lancamento_novo(request, tipo):
+    if tipo not in Tipo.values:
+        raise Http404("Tipo inválido.")
+    # O lançamento ainda não foi salvo; já nasce com o tipo vindo da URL.
+    lancamento = Lancamento(tipo=tipo)
+    form = LancamentoForm(request.POST or None, instance=lancamento)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, MENSAGENS_CADASTRO[tipo])
+        return redireciona_para_o_mes(lancamento.data)
+    contexto = {
+        "form": form,
+        "titulo": TITULOS_NOVO[tipo],
+        "url_cancelar": reverse("mes_atual"),
+    }
+    return render(request, "financas/lancamento_form.html", contexto)

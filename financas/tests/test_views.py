@@ -96,3 +96,101 @@ def test_link_mes_anterior_em_janeiro(client):  # CA19
     html = client.get("/2026/1/").content.decode()
     assert 'href="/2025/12/"' in html
     assert 'href="/2026/2/"' in html
+
+
+def dados_do_form(tipo, **campos):
+    nome = "Alimentação" if tipo == "gasto" else "Salário"
+    categoria = Categoria.objects.get(nome=nome, tipo=tipo)
+    dados = {
+        "valor": "50,00",
+        "data": "10/10/2026",
+        "descricao": "Mercado",
+        "categoria": categoria.pk,
+    }
+    dados.update(campos)
+    return dados
+
+
+def mensagens_da(resposta):
+    return [str(m) for m in resposta.context["messages"]]
+
+
+def test_cadastro_de_gasto(client):  # CA1
+    url = "/lancamentos/novo/gasto/"
+    resposta = client.post(url, dados_do_form("gasto"), follow=True)
+    assert resposta.redirect_chain == [("/2026/10/", 302)]
+    assert mensagens_da(resposta) == ["Gasto cadastrado com sucesso."]
+    lancamento = Lancamento.objects.get()
+    assert lancamento.tipo == Tipo.GASTO
+    assert lancamento.valor == Decimal("50.00")
+    assert lancamento.data == date(2026, 10, 10)
+
+
+def test_cadastro_de_receita(client):  # CA2
+    dados = dados_do_form("receita", valor="3000")
+    resposta = client.post("/lancamentos/novo/receita/", dados, follow=True)
+    assert resposta.redirect_chain == [("/2026/10/", 302)]
+    lancamento = Lancamento.objects.get()
+    assert lancamento.tipo == Tipo.RECEITA
+    assert lancamento.valor == Decimal("3000.00")
+    assert mensagens_da(resposta) == ["Receita cadastrada com sucesso."]
+
+
+def test_formulario_de_novo_gasto(client):  # CA3
+    resposta = client.get("/lancamentos/novo/gasto/")
+    html = resposta.content.decode()
+    form = resposta.context["form"]
+    assert {c.tipo for c in form.fields["categoria"].queryset} == {Tipo.GASTO}
+    assert form.initial["data"] == timezone.localdate()
+    assert f'value="{timezone.localdate():%Y-%m-%d}"' in html
+    assert "Novo gasto" in html
+
+
+@pytest.mark.parametrize("valor", ["0", "-10"])
+def test_cadastro_com_valor_zero_ou_negativo(client, valor):  # CA4
+    dados = dados_do_form("gasto", valor=valor)
+    resposta = client.post("/lancamentos/novo/gasto/", dados)
+    assert resposta.status_code == 200
+    assert "O valor deve ser maior que zero." in resposta.content.decode()
+    assert Lancamento.objects.count() == 0
+
+
+@pytest.mark.parametrize("valor", ["abc", ""])
+def test_cadastro_com_valor_invalido(client, valor):  # CA5
+    dados = dados_do_form("gasto", valor=valor)
+    resposta = client.post("/lancamentos/novo/gasto/", dados)
+    assert resposta.status_code == 200
+    assert resposta.context["form"].errors["valor"]
+    assert Lancamento.objects.count() == 0
+
+
+def test_cadastro_com_descricao_so_espacos(client):  # CA6
+    dados = dados_do_form("gasto", descricao="   ")
+    resposta = client.post("/lancamentos/novo/gasto/", dados)
+    assert "Informe uma descrição." in resposta.content.decode()
+    assert Lancamento.objects.count() == 0
+
+
+def test_cadastro_com_categoria_de_receita_num_gasto(client):  # CA7
+    receita = Categoria.objects.get(nome="Salário")
+    dados = dados_do_form("gasto", categoria=receita.pk)
+    resposta = client.post("/lancamentos/novo/gasto/", dados)
+    assert resposta.context["form"].errors["categoria"]
+    assert Lancamento.objects.count() == 0
+
+
+def test_tipo_invalido_da_404(client):  # CA8
+    assert client.get("/lancamentos/novo/outro/").status_code == 404
+    assert client.post("/lancamentos/novo/outro/", {}).status_code == 404
+
+
+def test_cadastro_com_valor_em_formato_brasileiro(client):  # CA9
+    dados = dados_do_form("gasto", valor="1.234,56")
+    client.post("/lancamentos/novo/gasto/", dados)
+    assert Lancamento.objects.get().valor == Decimal("1234.56")
+
+
+def test_botoes_de_novo_na_pagina_do_mes(client):
+    html = client.get("/2026/10/").content.decode()
+    assert "/lancamentos/novo/gasto/" in html
+    assert "/lancamentos/novo/receita/" in html
