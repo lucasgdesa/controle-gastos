@@ -1,0 +1,49 @@
+{% extends "financas/base.html" %}
+
+{% block titulo %}{{ data_mes|date:"F \d\e Y"|capfirst }} - Controle de Gastos{% endblock %}
+
+{% block conteudo %}
+  <h1>{{ data_mes|date:"F \d\e Y"|capfirst }}</h1>
+
+  <section class="totais">
+    <div class="cartao">
+      <span class="cartao-titulo">Total de receitas</span>
+      <strong class="cartao-valor receita">R$ {{ total_receitas|floatformat:"2g" }}</strong>
+    </div>
+    <div class="cartao">
+      <span class="cartao-titulo">Total de gastos</span>
+      <strong class="cartao-valor gasto">R$ {{ total_gastos|floatformat:"2g" }}</strong>
+    </div>
+    <div class="cartao">
+      <span class="cartao-titulo">Saldo</span>
+      <strong class="cartao-valor{% if saldo < 0 %} saldo-negativo{% endif %}">R$ {{ saldo|floatformat:"2g" }}</strong>
+    </div>
+  </section>
+
+  {% if lancamentos %}
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Descrição</th>
+          <th>Categoria</th>
+          <th>Tipo</th>
+          <th class="direita">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lancamento in lancamentos %}
+          <tr>
+            <td>{{ lancamento.data|date:"d/m/Y" }}</td>
+            <td>{{ lancamento.descricao }}</td>
+            <td>{{ lancamento.categoria }}</td>
+            <td>{{ lancamento.get_tipo_display }}</td>
+            <td class="direita {{ lancamento.tipo }}">R$ {{ lancamento.valor|floatformat:"2g" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="vazio">Nenhum lançamento neste mês.</p>
+  {% endif %}
+{% endblock %}

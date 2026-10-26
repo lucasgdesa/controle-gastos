@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block titulo %}Controle de Gastos{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'financas/css/estilo.css' %}" />
+  </head>
+  <body>
+    <header class="cabecalho">
+      <a href="{% url 'mes_atual' %}" class="marca">Controle de Gastos</a>
+      <a href="{% url 'mes_atual' %}">Mês atual</a>
+    </header>
+
+    <main class="conteudo">
+      {% if messages %}
+        <ul class="mensagens">
+          {% for mensagem in messages %}
+            <li class="mensagem {{ mensagem.tags }}">{{ mensagem }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% block conteudo %}{% endblock %}
+    </main>
+  </body>
+</html>
