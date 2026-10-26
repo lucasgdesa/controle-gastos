@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +26,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 # A chave vem do arquivo .env (que não vai para o git)
 load_dotenv(BASE_DIR / ".env")
-SECRET_KEY = os.environ["SECRET_KEY"]
+try:
+    SECRET_KEY = os.environ["SECRET_KEY"]
+except KeyError:
+    raise ImproperlyConfigured(
+        "SECRET_KEY não encontrada. Crie o arquivo .env a partir do .env.example (veja o README)."
+    ) from None
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"

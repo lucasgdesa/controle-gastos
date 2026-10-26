@@ -266,3 +266,13 @@ def test_links_de_editar_e_excluir_na_lista(client):
     html = client.get("/2026/10/").content.decode()
     assert f"/lancamentos/{gasto.pk}/editar/" in html
     assert f"/lancamentos/{gasto.pk}/excluir/" in html
+
+
+def test_exclusao_sem_token_csrf_e_barrada():
+    from django.test import Client
+
+    gasto = cria(Tipo.GASTO, "10.00", 15)
+    cliente = Client(enforce_csrf_checks=True)
+    resposta = cliente.post(f"/lancamentos/{gasto.pk}/excluir/")
+    assert resposta.status_code == 403
+    assert Lancamento.objects.filter(pk=gasto.pk).exists()

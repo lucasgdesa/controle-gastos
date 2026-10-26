@@ -13,7 +13,7 @@ Projeto de estudo: o código é simples de propósito (views em funções, `Mode
 
 ## Como rodar no Windows
 
-Pré-requisito: Python 3 instalado. Os comandos abaixo são para o **PowerShell**, dentro da pasta do projeto.
+Pré-requisito: Python 3 instalado. Os comandos abaixo são para o **PowerShell**, dentro da pasta do projeto. Para abrir o terminal nela: no Explorer, entre na pasta, clique na barra de endereço, digite `powershell` e aperte Enter.
 
 1. Criar o ambiente virtual:
 
@@ -47,6 +47,8 @@ Pré-requisito: Python 3 instalado. Os comandos abaixo são para o **PowerShell*
    ```powershell
    python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"
    ```
+
+   Para uso local, deixe `DEBUG=True` no `.env`; sem isso o `runserver` responde erro 400 e o CSS não carrega.
 
    O `.env` não vai para o git (está no `.gitignore`).
 
