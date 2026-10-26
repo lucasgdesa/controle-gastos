@@ -15,4 +15,9 @@ urlpatterns = [
         views.lancamento_editar,
         name="lancamento_editar",
     ),
+    path(
+        "lancamentos/<int:pk>/excluir/",
+        views.lancamento_excluir,
+        name="lancamento_excluir",
+    ),
 ]

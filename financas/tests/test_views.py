@@ -236,3 +236,33 @@ def test_edicao_com_erro_nao_salva(client):
 
 def test_editar_id_inexistente_da_404(client):  # CA14
     assert client.get("/lancamentos/999/editar/").status_code == 404
+
+
+def test_excluir_por_get_mostra_confirmacao(client):  # CA12
+    gasto = cria(Tipo.GASTO, "10.00", 15, descricao="Para apagar")
+    resposta = client.get(f"/lancamentos/{gasto.pk}/excluir/")
+    html = resposta.content.decode()
+    assert resposta.status_code == 200
+    assert "Tem certeza que deseja excluir?" in html
+    assert "Para apagar" in html
+    assert Lancamento.objects.filter(pk=gasto.pk).exists()
+
+
+def test_excluir_por_post(client):  # CA13
+    gasto = cria(Tipo.GASTO, "10.00", 15)
+    resposta = client.post(f"/lancamentos/{gasto.pk}/excluir/", follow=True)
+    assert resposta.redirect_chain == [("/2026/10/", 302)]
+    assert mensagens_da(resposta) == ["Gasto excluído com sucesso."]
+    assert not Lancamento.objects.filter(pk=gasto.pk).exists()
+
+
+def test_excluir_id_inexistente_da_404(client):  # CA14
+    assert client.get("/lancamentos/999/excluir/").status_code == 404
+    assert client.post("/lancamentos/999/excluir/").status_code == 404
+
+
+def test_links_de_editar_e_excluir_na_lista(client):
+    gasto = cria(Tipo.GASTO, "10.00", 15)
+    html = client.get("/2026/10/").content.decode()
+    assert f"/lancamentos/{gasto.pk}/editar/" in html
+    assert f"/lancamentos/{gasto.pk}/excluir/" in html

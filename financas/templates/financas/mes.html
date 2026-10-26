@@ -53,6 +53,7 @@
             <td class="direita {{ lancamento.tipo }}">R$ {{ lancamento.valor|floatformat:"2g" }}</td>
             <td class="acoes-linha">
               <a href="{% url 'lancamento_editar' lancamento.pk %}">Editar</a>
+              <a href="{% url 'lancamento_excluir' lancamento.pk %}">Excluir</a>
             </td>
           </tr>
         {% endfor %}

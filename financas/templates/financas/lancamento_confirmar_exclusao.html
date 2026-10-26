@@ -1,0 +1,28 @@
+{% extends "financas/base.html" %}
+
+{% block titulo %}Excluir lançamento - Controle de Gastos{% endblock %}
+
+{% block conteudo %}
+  <h1>Excluir lançamento</h1>
+
+  <dl class="detalhes">
+    <dt>Tipo</dt>
+    <dd>{{ lancamento.get_tipo_display }}</dd>
+    <dt>Data</dt>
+    <dd>{{ lancamento.data|date:"d/m/Y" }}</dd>
+    <dt>Descrição</dt>
+    <dd>{{ lancamento.descricao }}</dd>
+    <dt>Categoria</dt>
+    <dd>{{ lancamento.categoria }}</dd>
+    <dt>Valor</dt>
+    <dd>R$ {{ lancamento.valor|floatformat:"2g" }}</dd>
+  </dl>
+
+  <p>Tem certeza que deseja excluir?</p>
+
+  <form method="post" class="acoes">
+    {% csrf_token %}
+    <button type="submit" class="botao botao-perigo">Excluir</button>
+    <a class="botao botao-secundario" href="{{ url_cancelar }}">Cancelar</a>
+  </form>
+{% endblock %}

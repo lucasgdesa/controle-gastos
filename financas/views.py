@@ -15,6 +15,10 @@ MENSAGENS_EDICAO = {
     Tipo.GASTO: "Gasto atualizado com sucesso.",
     Tipo.RECEITA: "Receita atualizada com sucesso.",
 }
+MENSAGENS_EXCLUSAO = {
+    Tipo.GASTO: "Gasto excluído com sucesso.",
+    Tipo.RECEITA: "Receita excluída com sucesso.",
+}
 MENSAGENS_CADASTRO = {
     Tipo.GASTO: "Gasto cadastrado com sucesso.",
     Tipo.RECEITA: "Receita cadastrada com sucesso.",
@@ -83,3 +87,20 @@ def lancamento_editar(request, pk):
         "url_cancelar": url_cancelar,
     }
     return render(request, "financas/lancamento_form.html", contexto)
+
+
+def lancamento_excluir(request, pk):
+    lancamento = get_object_or_404(Lancamento, pk=pk)
+    # Exclusão só acontece por POST; o GET apenas mostra a confirmação.
+    if request.method == "POST":
+        data = lancamento.data
+        lancamento.delete()
+        messages.success(request, MENSAGENS_EXCLUSAO[lancamento.tipo])
+        return redireciona_para_o_mes(data)
+    contexto = {
+        "lancamento": lancamento,
+        "url_cancelar": reverse(
+            "mes", args=[lancamento.data.year, lancamento.data.month]
+        ),
+    }
+    return render(request, "financas/lancamento_confirmar_exclusao.html", contexto)
