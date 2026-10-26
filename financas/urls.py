@@ -10,4 +10,9 @@ urlpatterns = [
         views.lancamento_novo,
         name="lancamento_novo",
     ),
+    path(
+        "lancamentos/<int:pk>/editar/",
+        views.lancamento_editar,
+        name="lancamento_editar",
+    ),
 ]

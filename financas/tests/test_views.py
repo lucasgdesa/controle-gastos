@@ -194,3 +194,45 @@ def test_botoes_de_novo_na_pagina_do_mes(client):
     html = client.get("/2026/10/").content.decode()
     assert "/lancamentos/novo/gasto/" in html
     assert "/lancamentos/novo/receita/" in html
+
+
+def test_editar_gasto(client):  # CA10
+    gasto = cria(Tipo.GASTO, "10.00", 15, descricao="Antigo")
+    dados = dados_do_form("gasto", descricao="Novo", valor="99,90", data="02/11/2026")
+    resposta = client.post(f"/lancamentos/{gasto.pk}/editar/", dados, follow=True)
+    assert resposta.redirect_chain == [("/2026/11/", 302)]
+    assert mensagens_da(resposta) == ["Gasto atualizado com sucesso."]
+    gasto.refresh_from_db()
+    assert gasto.descricao == "Novo"
+    assert gasto.valor == Decimal("99.90")
+    assert gasto.tipo == Tipo.GASTO
+
+
+def test_editar_nao_deixa_trocar_o_tipo(client):  # CA10
+    gasto = cria(Tipo.GASTO, "10.00", 15)
+    dados = {**dados_do_form("gasto"), "tipo": "receita"}
+    client.post(f"/lancamentos/{gasto.pk}/editar/", dados)
+    gasto.refresh_from_db()
+    assert gasto.tipo == Tipo.GASTO
+
+
+def test_tela_de_edicao(client):  # CA11
+    gasto = cria(Tipo.GASTO, "10.00", 15)
+    resposta = client.get(f"/lancamentos/{gasto.pk}/editar/")
+    form = resposta.context["form"]
+    assert "tipo" not in form.fields
+    assert {c.tipo for c in form.fields["categoria"].queryset} == {Tipo.GASTO}
+    assert "Editar gasto" in resposta.content.decode()
+
+
+def test_edicao_com_erro_nao_salva(client):
+    gasto = cria(Tipo.GASTO, "10.00", 15, descricao="Antigo")
+    dados = dados_do_form("gasto", valor="0")
+    resposta = client.post(f"/lancamentos/{gasto.pk}/editar/", dados)
+    assert resposta.status_code == 200
+    gasto.refresh_from_db()
+    assert gasto.valor == Decimal("10.00")
+
+
+def test_editar_id_inexistente_da_404(client):  # CA14
+    assert client.get("/lancamentos/999/editar/").status_code == 404

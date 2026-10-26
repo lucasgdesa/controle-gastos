@@ -40,6 +40,7 @@
           <th>Categoria</th>
           <th>Tipo</th>
           <th class="direita">Valor</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -50,6 +51,9 @@
             <td>{{ lancamento.categoria }}</td>
             <td>{{ lancamento.get_tipo_display }}</td>
             <td class="direita {{ lancamento.tipo }}">R$ {{ lancamento.valor|floatformat:"2g" }}</td>
+            <td class="acoes-linha">
+              <a href="{% url 'lancamento_editar' lancamento.pk %}">Editar</a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>

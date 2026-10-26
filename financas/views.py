@@ -2,7 +2,7 @@ from datetime import date
 
 from django.contrib import messages
 from django.http import Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
@@ -10,6 +10,11 @@ from .forms import LancamentoForm
 from .models import Lancamento, Tipo, resumo_do_mes
 
 TITULOS_NOVO = {Tipo.GASTO: "Novo gasto", Tipo.RECEITA: "Nova receita"}
+TITULOS_EDITAR = {Tipo.GASTO: "Editar gasto", Tipo.RECEITA: "Editar receita"}
+MENSAGENS_EDICAO = {
+    Tipo.GASTO: "Gasto atualizado com sucesso.",
+    Tipo.RECEITA: "Receita atualizada com sucesso.",
+}
 MENSAGENS_CADASTRO = {
     Tipo.GASTO: "Gasto cadastrado com sucesso.",
     Tipo.RECEITA: "Receita cadastrada com sucesso.",
@@ -59,5 +64,22 @@ def lancamento_novo(request, tipo):
         "form": form,
         "titulo": TITULOS_NOVO[tipo],
         "url_cancelar": reverse("mes_atual"),
+    }
+    return render(request, "financas/lancamento_form.html", contexto)
+
+
+def lancamento_editar(request, pk):
+    lancamento = get_object_or_404(Lancamento, pk=pk)
+    # Guarda o mês de antes: o form altera a data do objeto ao validar.
+    url_cancelar = reverse("mes", args=[lancamento.data.year, lancamento.data.month])
+    form = LancamentoForm(request.POST or None, instance=lancamento)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, MENSAGENS_EDICAO[lancamento.tipo])
+        return redireciona_para_o_mes(lancamento.data)
+    contexto = {
+        "form": form,
+        "titulo": TITULOS_EDITAR[lancamento.tipo],
+        "url_cancelar": url_cancelar,
     }
     return render(request, "financas/lancamento_form.html", contexto)
