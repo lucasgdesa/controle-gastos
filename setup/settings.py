@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "financas",
 ]
 
 MIDDLEWARE = [
@@ -130,3 +131,4 @@ MAILERS = {
         "BACKEND": "django.core.mail.backends.console.EmailBackend",
     },
 }
+USE_THOUSAND_SEPARATOR = True  # aceita 1.234,56 nos formulários
